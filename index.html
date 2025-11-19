@@ -182,67 +182,75 @@
     }
 
     // GONDER FONKSİYONU
-    function gonder() {
-      // 1. Gerekli Kontroller
-      if (!document.getElementById("sinif").value || document.getElementById("sinif").value === "Seçiniz") {
+function gonder() {
+    // 1. Gerekli Kontroller
+    if (!document.getElementById("sinif").value || document.getElementById("sinif").value === "Seçiniz") {
         alert("Lütfen Sınıf alanını doldurun.");
         return;
-      }
+    }
 
-      // 2. Kısıtlama Kontrolü
-      if (sinifDahaOnceDolduruldu) {
-          alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
-          return;
-      }
-      
-      // !!! YENİ: 35 Sayı Kısıtlaması için Gelişmiş Kontrol
-      let sinifGecerli = true;
-      maddeler.forEach((madde, i) => {
-          let inputElement = document.getElementById(`m${i+1}`);
-          let deger = parseInt(inputElement.value);
+    // 2. Kısıtlama Kontrolü
+    if (sinifDahaOnceDolduruldu) {
+        alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
+        return;
+    }
 
-          // Sayı değilse veya 0'dan küçük ya da 35'ten büyükse hata ver
-          if (isNaN(deger) || deger < 0 || deger > 35) {
-              alert(`HATA: ${i+1}. maddeye girilen değer geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
-              inputElement.focus(); // Hatalı alana odaklan
-              sinifGecerli = false;
-              return; // Döngüden çıkmak için
-          }
-      });
+    // !!! YENİ VE GÜVENİLİR KISITLAMA KONTROLÜ (0-35 Aralığı)
+    let sinifGecerli = true;
+    let hatalıMaddeNo = -1; // Hatalı maddenin numarasını tutar
 
-      if (!sinifGecerli) {
-          return; // Geçersiz giriş varsa işlemi durdur
-      }
-      // !!! Kısıtlama Kontrolü Bitti
+    for (let i = 0; i < maddeler.length; i++) {
+        let inputElement = document.getElementById(`m${i + 1}`);
+        let deger = inputElement.value.trim(); // Boşlukları temizle
+        let sayiDeger = parseInt(deger);
 
-      
-      let data = {
+        // Boş bırakılanları 0 olarak kabul et, ancak sınır kontrolünü yap
+        if (deger === "") {
+            sayiDeger = 0;
+        }
+
+        // Sayı değilse VEYA 0'dan küçük VEYA 35'ten büyükse
+        if (isNaN(sayiDeger) || sayiDeger < 0 || sayiDeger > 35) {
+            hatalıMaddeNo = i + 1;
+            sinifGecerli = false;
+            inputElement.focus();
+            break; // Hata bulunduğunda döngüyü hemen durdur
+        }
+    }
+
+    if (!sinifGecerli) {
+        alert(`HATA: ${hatalıMaddeNo}. maddeye girilen değer geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
+        return; // Geçersiz giriş varsa işlemi durdur ve gönderimi engelle
+    }
+    // !!! Kısıtlama Kontrolü Bitti
+
+    let data = {
         sinif: document.getElementById("sinif").value,
         tarih: new Date().toLocaleString()
-      };
-      
-      // 3. Veri Toplama
-      maddeler.forEach((_, i) => {
-        let deger = document.getElementById(`m${i+1}`).value.trim();
-        data[`m${i+1}`] = deger === "" ? "0" : deger;
-      });
+    };
 
-      // 4. Veriyi Gönderme
-      document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
-      
-      fetch(WEB_APP_URL, {
+    // 3. Veri Toplama (Artık tüm değerlerin 0-35 arasında olduğu garanti)
+    maddeler.forEach((_, i) => {
+        let deger = document.getElementById(`m${i + 1}`).value.trim();
+        data[`m${i + 1}`] = deger === "" ? "0" : deger;
+    });
+
+    // 4. Veriyi Gönderme
+    document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
+
+    fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
-        body: JSON.stringify(data) 
-      }).then(() => {
+        body: JSON.stringify(data)
+    }).then(() => {
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
-        sinifDahaOnceDolduruldu = true; 
+        sinifDahaOnceDolduruldu = true;
         document.getElementById("gonderBtn").disabled = true;
-      }).catch(error => {
+    }).catch(error => {
         document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
         console.error('Gönderme hatası:', error);
-      });
-    }
+    });
+}
 
     // TEMİZLE FONKSİYONU
     function temizle() {
@@ -265,3 +273,4 @@
   </script>
 </body>
 </html>
+
