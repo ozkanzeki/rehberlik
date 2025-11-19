@@ -75,7 +75,7 @@
 
   <script>
     // **ÖNEMLİ: Bu URL doğru olmalıdır.**
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDi_30Il4pBG7U8C5ViMu4Ji3Qn4hYw00RzSvuLvVzHERUElgPeySNH5AgEPFl_rRtnA/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
     // Kontrol sonucu buraya kaydedilecek
     let sinifDahaOnceDolduruldu = false;
@@ -124,7 +124,7 @@
       opt.value = s; opt.text = s; select.add(opt);
     });
 
-    // Maddeleri ekleme: max="35" kısıtlaması zaten ekliydi
+    // Maddeleri ekleme: max="35" kısıtlaması zaten ekli
     const grid = document.querySelector(".grid");
     maddeler.forEach((madde, i) => {
       let div = document.createElement("div");
@@ -180,7 +180,7 @@
             });
     }
 
-    // YENİDEN DÜZENLENMİŞ GONDER FONKSİYONU
+    // GONDER FONKSİYONU
     function gonder() {
         // 1. Gerekli Kontroller
         if (!document.getElementById("sinif").value || document.getElementById("sinif").value === "Seçiniz") {
@@ -194,17 +194,21 @@
             return;
         }
 
-        // !!! GÜVENİLİR KISITLAMA KONTROLÜ (Array.some kullanılarak) !!!
+        // !!! YENİ VE GÜVENİLİR KISITLAMA KONTROLÜ (Boşluk ve 0-35 Aralığı) !!!
         const hatalıGirisBulundu = maddeler.some((_, i) => {
             let inputElement = document.getElementById(`m${i + 1}`);
             let deger = inputElement.value.trim();
             let sayiDeger;
 
+            // KONTROL A: Boş Bırakıldı mı? (Yeni Kontrol)
             if (deger === "") {
-                sayiDeger = 0;
-            } else {
-                sayiDeger = parseInt(deger);
-            }
+                alert(`HATA: ${i + 1}. madde boş bırakılamaz. Lütfen 0 ile 35 arasında bir sayı girin.`);
+                inputElement.focus();
+                return true; // Hata bulundu, döngüyü durdur
+            } 
+            
+            // KONTROL B: Sayı ve Sınırlar İçinde mi?
+            sayiDeger = parseInt(deger);
 
             // Sayı değilse VEYA 0'dan küçük VEYA 35'ten büyükse
             if (isNaN(sayiDeger) || sayiDeger < 0 || sayiDeger > 35) {
@@ -212,6 +216,7 @@
                 inputElement.focus();
                 return true; // Hata bulundu, döngüyü durdur
             }
+            
             return false;
         });
 
@@ -227,10 +232,11 @@
             tarih: new Date().toLocaleString()
         };
 
-        // 3. Veri Toplama
+        // 3. Veri Toplama (Değerler zaten kontrol edildi)
         maddeler.forEach((_, i) => {
             let deger = document.getElementById(`m${i + 1}`).value.trim();
-            data[`m${i + 1}`] = deger === "" ? "0" : deger;
+            // Boş olamayacağı garanti edildiği için burada sadece değeri alıyoruz.
+            data[`m${i + 1}`] = deger; 
         });
 
         // 4. Veriyi Gönderme
@@ -271,5 +277,3 @@
   </script>
 </body>
 </html>
-
-
