@@ -9,29 +9,28 @@
     h1 { text-align: center; color: #333; }
     .form-container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     label { display: block; margin: 15px 0 5px; font-weight: bold; }
-
-    /* ********** GENİŞLİK DEĞİŞİKLİĞİ ********** */
-    /* Giriş alanlarını daha dar hale getiriyoruz */
+    
     select, input[type="text"], input[type="number"] { 
-        width: 300px; /* Genişliği 300 piksel olarak sınırladık */
-        max-width: 100%; /* Mobil cihazlarda taşmayı engeller */
+        width: 300px; 
+        max-width: 100%; 
         padding: 10px; 
         border: 1px solid #ccc; 
         border-radius: 5px; 
-        box-sizing: border-box; /* Padding'in genişliğe dahil olmasını sağlar */
+        box-sizing: border-box;
     }
-    /* ********************************************** */
 
-    /* ********** SIRA DİZİLİMİ DEĞİŞİKLİĞİ ********** */
+    /* Sınıfın durumuna göre kenarlık rengi */
+    #sinif.error { border: 2px solid red; }
+    #sinif.success { border: 2px solid green; }
+
+
     .grid { 
         display: grid; 
-        grid-template-columns: 1fr; /* Tüm soruları alt alta tek bir sütun yapar */
+        grid-template-columns: 1fr; 
         gap: 10px; 
         margin-top: 20px; 
     }
-    /* ********************************************** */
     
-    /* Butonlar için stil */
     .button-group { text-align: center; margin-top: 30px; }
     .button-group button { 
       padding: 15px 30px; 
@@ -46,6 +45,9 @@
     .temizle-btn { background: #dc3545; color: white; } 
     .temizle-btn:hover { background: #c82333; }
     
+    /* Pasif buton görünümü */
+    .gonder-btn[disabled] { background: #9e9e9e; cursor: not-allowed; }
+    
     .info { text-align: center; color: #666; margin-top: 20px; }
   </style>
 </head>
@@ -58,13 +60,11 @@
     <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin.</p>
 
     <label>Sınıf / Şube</label>
-    <select id="sinif"></select>
-
-    <div class="grid">
+    <select id="sinif" onchange="kontrolEt()"></select> <div class="grid">
       </div>
 
     <div class="button-group">
-        <button class="gonder-btn" onclick="gonder()">Gönder</button>
+        <button class="gonder-btn" id="gonderBtn" onclick="gonder()">Gönder</button>
         <button class="temizle-btn" onclick="temizle()">Temizle</button>
     </div>
 
@@ -72,10 +72,14 @@
   </div>
 
   <script>
+    // ÖNEMLİ: Bu, kontrol ve gönderme için ortak GAS URL'nizdir.
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
+    // Kontrol sonucu buraya kaydedilecek
+    let sinifDahaOnceDolduruldu = false;
+
     const siniflar = [
-      "1-A","1-B","1-C","1-D","1-E","1-F",
+      "Seçiniz","1-A","1-B","1-C","1-D","1-E","1-F",
       "2-A","2-B","2-C","2-D","2-E","2-F",
       "2. Sınıf - Hafif Zihinsel / A Şubesi",
       "2. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
@@ -126,12 +130,63 @@
       grid.appendChild(div);
     });
 
+    // *** YENİ: Sınıfı sunucudan kontrol eden fonksiyon ***
+    function kontrolEt() {
+        const sinif = document.getElementById("sinif").value;
+        const sonucDiv = document.getElementById("sonuc");
+        const gonderBtn = document.getElementById("gonderBtn");
+        const sinifSelect = document.getElementById("sinif");
+
+        // Başlangıç veya boş seçim ise kontrol yapma
+        if (!sinif || sinif === "Seçiniz") {
+            sinifDahaOnceDolduruldu = false;
+            gonderBtn.disabled = false;
+            sinifSelect.className = '';
+            sonucDiv.innerHTML = '';
+            return;
+        }
+
+        sonucDiv.innerHTML = "<b style='color:blue'>Kontrol ediliyor...</b>";
+        gonderBtn.disabled = true;
+        sinifSelect.className = ''; // Stil temizle
+
+        // Kontrol için Google Apps Script'e GET isteği gönderme
+        fetch(`${WEB_APP_URL}?sinif=${encodeURIComponent(sinif)}`)
+            .then(response => response.json())
+            .then(data => {
+                // Varsayım: GAS, { exists: true/false } şeklinde yanıt veriyor.
+                sinifDahaOnceDolduruldu = data.exists;
+
+                if (sinifDahaOnceDolduruldu) {
+                    sonucDiv.innerHTML = `<b style='color:red'>⚠️ Uyarı: ${sinif} şubesi daha önce doldurulmuştur. Tekrar gönderim YAPILAMAZ.</b>`;
+                    gonderBtn.disabled = true;
+                    sinifSelect.className = 'error';
+                } else {
+                    sonucDiv.innerHTML = `<b style='color:green'>✅ ${sinif} şubesi daha önce doldurulmamış. Gönderim yapılabilir.</b>`;
+                    gonderBtn.disabled = false;
+                    sinifSelect.className = 'success';
+                }
+            })
+            .catch(error => {
+                sonucDiv.innerHTML = "<b style='color:red'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
+                gonderBtn.disabled = true;
+                sinifSelect.className = 'error';
+                console.error("Kontrol hatası:", error);
+            });
+    }
+
     // GONDER FONKSİYONU
     function gonder() {
       // 1. Gerekli Kontroller
-      if (!document.getElementById("sinif").value) {
+      if (!document.getElementById("sinif").value || document.getElementById("sinif").value === "Seçiniz") {
         alert("Lütfen Sınıf alanını doldurun.");
         return;
+      }
+
+      // *** YENİ KONTROL: Daha önce doldurulduysa gönderime izin verme ***
+      if (sinifDahaOnceDolduruldu) {
+          alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
+          return;
       }
       
       let data = {
@@ -154,6 +209,9 @@
         body: JSON.stringify(data) 
       }).then(() => {
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
+        // Başarılı gönderim sonrası tekrar doldurulmasını engelle
+        sinifDahaOnceDolduruldu = true; 
+        document.getElementById("gonderBtn").disabled = true;
       }).catch(error => {
         document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
         console.error('Gönderme hatası:', error);
@@ -164,13 +222,16 @@
     function temizle() {
         // Sınıf seçimini ilk değere ayarla
         document.getElementById("sinif").selectedIndex = 0;
+        document.getElementById("sinif").className = '';
 
         // Tüm madde (input) alanlarını temizle
         maddeler.forEach((_, i) => {
             document.getElementById(`m${i+1}`).value = "";
         });
 
-        // Sonuç mesajını temizle
+        // Sonuç durumunu sıfırla ve butonu etkinleştir
+        sinifDahaOnceDolduruldu = false;
+        document.getElementById("gonderBtn").disabled = false;
         document.getElementById("sonuc").innerHTML = "";
 
         alert("Form temizlendi.");
