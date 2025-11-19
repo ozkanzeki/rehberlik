@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Öğrenci Durum Tespit Formu</title>
+  <style>
+    :root{--bg:#f7fafc;--card:#ffffff;--accent:#2563eb;--muted:#6b7280}
+    body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); margin:0; padding:24px}
+    .container{max-width:980px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted)}
+    form{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .field{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:8px;border:1px solid #eef2f7;background:#fff}
+    label{font-weight:600;font-size:13px}
+    small{color:var(--muted)}
+    input[type="number"], select, textarea{padding:8px;border:1px solid #e6eef8;border-radius:6px;font-size:14px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{background:var(--accent);color:white;border:none;padding:10px 12px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#111827;opacity:0.9}
+    button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(37,99,235,0.12)}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    @media (max-width:520px){body{padding:12px}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Okul Risk Haritası</h1>
+        <p class="lead">Her soru için ilgili sayıyı giriniz. 0 = yok. Kaydetmeden önce kontrol edin.</p>
+      </div>
+    </header>
+
+    <form id="form">
+      <div class="field" style="margin-bottom:12px; max-width:260px;">
+        <label for="classSelect">Sınıf Seçiniz:</label>
+        <select id="classSelect" name="classSelect">
+          <option value="">Seçiniz</option>
+          <option value="1-A">1-A</option>
+          <option value="1-B">1-B</option>
+          <option value="1-C">1-C</option>
+          <option value="1-D">1-D</option>
+          <option value="1-E">1-E</option>
+          <option value="1-F">1-F</option>
+          <option value="2-A">2-A</option>
+          <option value="2-B">2-B</option>
+          <option value="2-C">2-C</option>
+          <option value="2-D">2-D</option>
+          <option value="2-E">2-E</option>
+          <option value="2-F">2-F</option>
+          <option value="HZ-A1">Sınıf - Hafif Zihinsel / A Şubesi</option>
+          <option value="OAZ-AA1">Sınıf - Orta-Ağır Zihinsel / AA Şubesi</option>
+          <option value="OH-A1">Sınıf - Otistik Hafif / A Şubesi</option>
+          <option value="3-A">3-A</option>
+          <option value="3-B">3-B</option>
+          <option value="3-C">3-C</option>
+          <option value="3-D">3-D</option>
+          <option value="3-E">3-E</option>
+          <option value="3-F">3-F</option>
+          <option value="HZ-A2">Sınıf - Hafif Zihinsel / A Şubesi (3. Sınıf)</option>
+          <option value="OH-A2">Sınıf - Otistik Hafif / A Şubesi (3. Sınıf)</option>
+          <option value="4-A">4-A</option>
+          <option value="4-B">4-B</option>
+          <option value="4-C">4-C</option>
+          <option value="4-D">4-D</option>
+          <option value="4-E">4-E</option>
+          <option value="4-F">4-F</option>
+          <option value="HZ-AA2">Sınıf - Hafif Zihinsel / AA Şubesi (4. Sınıf)</option>
+          <option value="OAZ-AA2">Sınıf - Orta-Ağır Zihinsel / AA Şubesi (4. Sınıf)</option>
+          <option value="OH-A3">Sınıf - Otistik Hafif / A Şubesi (4. Sınıf)</option>
+          <option value="Diger">Diğer (lütfen belirtin)</option>
+        </select>
+      </div>
+      <div class="grid">
+
+        
+        <div class="field"><label for="q1">1. Kaç öğrencinizin annesi en fazla ilkokul mezunu?</label><input type="number" id="q1" name="q1" min="0" value="0"></div>
+        <div class="field"><label for="q2">2. Kaç öğrencinizin babası en fazla ilkokul mezunu?</label><input type="number" id="q2" name="q2" min="0" value="0"></div>
+        <div class="field"><label for="q3">3. Sınıfınızda yalnızca tek çocuk olan kaç öğrenci var?</label><input type="number" id="q3" name="q3" min="0" value="0"></div>
+        <div class="field"><label for="q4">4. Kaç öğrencinizin 5 veya daha fazla kardeşi var?</label><input type="number" id="q4" name="q4" min="0" value="0"></div>
+        <div class="field"><label for="q5">5. Kaç öğrencinizin anne ve babası ayrı yaşıyor?</label><input type="number" id="q5" name="q5" min="0" value="0"></div>
+        <div class="field"><label for="q6">6. Kaç öğrencinizin anne ve babası boşanmış?</label><input type="number" id="q6" name="q6" min="0" value="0"></div>
+        <div class="field"><label for="q7">7. Sınıfınızda yalnızca annesi ile yaşayan kaç öğrenci var?</label><input type="number" id="q7" name="q7" min="0" value="0"></div>
+        <div class="field"><label for="q8">8. Sınıfınızda yalnızca babası ile yaşayan kaç öğrenci var?</label><input type="number" id="q8" name="q8" min="0" value="0"></div>
+        <div class="field"><label for="q9">9. Kaç öğrencinizin annesi hayatta değil?</label><input type="number" id="q9" name="q9" min="0" value="0"></div>
+        <div class="field"><label for="q10">10. Kaç öğrencinizin babası hayatta değil?</label><input type="number" id="q10" name="q10" min="0" value="0"></div>
+        <div class="field"><label for="q11">11. Kaç öğrencinizin anne ve babası hayatta değil?</label><input type="number" id="q11" name="q11" min="0" value="0"></div>
+        <div class="field"><label for="q12">12. Sınıfınızda şehit çocuğu olan kaç öğrenci var?</label><input type="number" id="q12" name="q12" min="0" value="0"></div>
+        <div class="field"><label for="q13">13. Kaç öğrenciniz yalnızca büyükanne/büyükbabasıyla yaşıyor?</label><input type="number" id="q13" name="q13" min="0" value="0"></div>
+        <div class="field"><label for="q14">14. Kaç öğrenciniz yalnızca diğer akrabalarıyla yaşıyor?</label><input type="number" id="q14" name="q14" min="0" value="0"></div>
+        <div class="field"><label for="q15">15. Kaç öğrenciniz koruyucu aile gözetiminde?</label><input type="number" id="q15" name="q15" min="0" value="0"></div>
+        <div class="field"><label for="q16">16. Kaç öğrenciniz sevgi evlerinde kalıyor?</label><input type="number" id="q16" name="q16" min="0" value="0"></div>
+        <div class="field"><label for="q17">17. Kaç öğrenciniz Sosyal Hizmetler Çocuk Esirgeme Kurumu'nda kalıyor?</label><input type="number" id="q17" name="q17" min="0" value="0"></div>
+        <div class="field"><label for="q18">18. Kaç öğrencinizin ailesinde süreğen hastalık var?</label><input type="number" id="q18" name="q18" min="0" value="0"></div>
+        <div class="field"><label for="q19">19. Kaç öğrencinizin ailesinde ruhsal hastalık var?</label><input type="number" id="q19" name="q19" min="0" value="0"></div>
+        <div class="field"><label for="q20">20. Kaç öğrencinizin ailesinde bağımlı bireyler (alkol/madde) bulunuyor?</label><input type="number" id="q20" name="q20" min="0" value="0"></div>
+        <div class="field"><label for="q21">21. Kaç öğrencinizin ailesinde cezai hüküm bulunuyor?</label><input type="number" id="q21" name="q21" min="0" value="0"></div>
+        <div class="field"><label for="q22">22. Kaç öğrencinizin ailesi mevsimlik işçi?</label><input type="number" id="q22" name="q22" min="0" value="0"></div>
+        <div class="field"><label for="q23">23. Kaç öğrenciniz aile içi şiddete maruz kalıyor?</label><input type="number" id="q23" name="q23" min="0" value="0"></div>
+        <div class="field"><label for="q24">24. Sınıfınızda özel yetenekli tanısı konulan kaç öğrenci var?</label><input type="number" id="q24" name="q24" min="0" value="0"></div>
+        <div class="field"><label for="q25">25. Kaç öğrencinizin yetersizlik alanında özel eğitim raporu var?</label><input type="number" id="q25" name="q25" min="0" value="0"></div>
+        <div class="field"><label for="q26">26. Kaç öğrencinizin süreğen hastalığı var?</label><input type="number" id="q26" name="q26" min="0" value="0"></div>
+        <div class="field"><label for="q27">27. Kaç öğrencinizin ruhsal hastalığı var?</label><input type="number" id="q27" name="q27" min="0" value="0"></div>
+        <div class="field"><label for="q28">28. Kaç öğrencinizin ailesinde Danışmanlık Tedbir Kararı var?</label><input type="number" id="q28" name="q28" min="0" value="0"></div>
+        <div class="field"><label for="q29">29. Kaç öğrencinizin ailesinde Eğitim Tedbir Kararı var?</label><input type="number" id="q29" name="q29" min="0" value="0"></div>
+        <div class="field"><label for="q30">30. Kaç öğrenciniz maddi sıkıntı yaşıyor?</label><input type="number" id="q30" name="q30" min="0" value="0"></div>
+        <div class="field"><label for="q31">31. Sınıfınızda sürekli devamsız olan kaç öğrenci var?</label><input type="number" id="q31" name="q31" min="0" value="0"></div>
+        <div class="field"><label for="q32">32. Kaç öğrenciniz bir işte çalışıyor?</label><input type="number" id="q32" name="q32" min="0" value="0"></div>
+        <div class="field"><label for="q33">33. Kaç öğrencinizin akademik başarısı düşük?</label><input type="number" id="q33" name="q33" min="0" value="0"></div>
+        <div class="field"><label for="q34">34. Kaç öğrenciniz riskli akran grubuna dahil?</label><input type="number" id="q34" name="q34" min="0" value="0"></div>
+        <div class="field"><label for="q35">35. Kaç öğrenciniz yabancı uyruklu?</label><input type="number" id="q35" name="q35" min="0" value="0"></div>
+        <div class="field"><label for="q36">36. Sınıfınızda diğer belirttiğiniz durumda kaç öğrenci var? (açıklama)</label><input type="number" id="q36" name="q36" min="0" value="0"><small>Altında açıklama yazınız</small><textarea id="q36_note" name="q36_note" rows="2" placeholder="Diğer durumu kısaca yazınız..."></textarea></div>
+
+      </div>
+
+      <div class="actions">
+        <button type="button" id="saveJson">JSON Olarak İndir</button>
+        <button type="button" id="saveCsv" class="ghost">CSV Olarak İndir</button>
+        <button type="button" id="reset" class="secondary">Sıfırla</button>
+        <button type="button" id="fillSample" class="ghost">Örnek Doldur</button>
+      </div>
+
+      <footer>
+        <small>Not: Bu form yerel cihazda çalışır. Kişisel verilerin paylaşımında dikkat ediniz.</small>
+      </footer>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    function collect(){
+      const data = {};
+      for(let i=1;i<=36;i++){
+        const key = 'q'+i;
+        const el = document.getElementById(key);
+        data[key] = el ? Number(el.value || 0) : 0;
+      }
+      data['q36_note'] = document.getElementById('q36_note').value || '';
+      data['classSelect'] = document.getElementById('classSelect').value || '';
+      data['generatedAt'] = new Date().toISOString();
+      return data;
+    }
+    function download(filename, content){
+      const a = document.createElement('a');
+      const blob = new Blob([content],{type:'application/octet-stream'});
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    }
+    document.getElementById('saveJson').addEventListener('click', ()=>{
+      const data = collect();
+      download('ogrenci_durum_' + new Date().toISOString().slice(0,10) + '.json', JSON.stringify(data, null, 2));
+    });
+    document.getElementById('saveCsv').addEventListener('click', ()=>{
+      const data = collect();
+      const keys = Object.keys(data);
+      const rows = [keys.join(',') , keys.map(k=> '"'+String(data[k]).replace(/"/g,'""')+'"').join(',')];
+      download('ogrenci_durum_' + new Date().toISOString().slice(0,10) + '.csv', rows.join('\n'));
+    });
+    document.getElementById('reset').addEventListener('click', ()=>{
+      if(confirm('Form sıfırlansın mı?')){
+        form.reset();
+        // ensure numbers default to 0
+        for(let i=1;i<=36;i++){ const el=document.getElementById('q'+i); if(el) el.value='0'; }
+      }
+    });
+    document.getElementById('fillSample').addEventListener('click', ()=>{
+      // örnek veriler (düzenlenebilir)
+      const sample = [2,3,5,1,0,1,2,0,0,1,0,0,1,0,0,0,0,4,1,0,0,0,0,2,1,0,0,0,0,3,0,5,4,2,1,0];
+      for(let i=1;i<=36;i++){ const el=document.getElementById('q'+i); if(el) el.value = sample[i-1] ?? 0; }
+      document.getElementById('q36_note').value = 'Örnek: geçici barınma ihtiyacı';
+    });
+
+    // initialize number fields to 0
+    window.addEventListener('load', ()=>{
+      for(let i=1;i<=36;i++){ const el=document.getElementById('q'+i); if(el && el.value==='') el.value='0'; }
+    });
+  </script>
+</body>
+</html>
