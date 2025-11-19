@@ -18,6 +18,9 @@
 </head>
 <body>
   <div class="form-container">
+<div style="text-align:center; margin-bottom:20px;">
+  <img src="logo.png" alt="Okul Logosu" style="max-height:100px;">
+</div>
     <h1>Okul Risk Haritası Anketi</h1>
     <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin.</p>
 
@@ -105,7 +108,7 @@
     const grid = document.querySelector(".grid");
     maddeler.forEach((madde, i) => {
       let div = document.createElement("div");
-      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" id="m${i+1}" value="0">`;
+      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" id="m${i+1}" placeholder="Sayı giriniz">`;
       grid.appendChild(div);
     });
 
@@ -116,8 +119,8 @@
         tarih: new Date().toLocaleString()
       };
       maddeler.forEach((_, i) => {
-        data[`m${i+1}`] = document.getElementById(`m${i+1}`).value || "0";
-      });
+        let deger = document.getElementById(`m${i+1}`).value.trim();
+data[`m${i+1}`] = deger === "" ? "0" : deger;
 
       fetch(WEB_APP_URL, {
         method: "POST",
@@ -129,5 +132,9 @@
       });
     }
   </script>
-</body>
+</body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background: linear-gradient(to right, #e0f7fa, #ffffff);
+}>
 </html>
