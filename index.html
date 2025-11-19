@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Okul Risk Haritası Anketi</title>
   <style>
-    /* ... (CSS Kodunuz) ... */
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
     h1 { text-align: center; color: #333; }
     .form-container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -58,7 +57,7 @@
       <img src="logo.png" alt="Okul Logosu" style="max-height:100px;">
     </div>
     <h1>Okul Risk Haritası Anketi</h1>
-    <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin.</p>
+    <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin. Girişler en fazla 35 olabilir.</p>
 
     <label>Sınıf / Şube</label>
     <select id="sinif" onchange="kontrolEt()"></select>
@@ -76,7 +75,7 @@
 
   <script>
     // **ÖNEMLİ: Bu URL doğru olmalıdır.**
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDi_30Il4pBG7U8C5ViMu4Ji3Qn4hYw00RzSvuLvVzHERUElgPeySNH5AgEPFl_rRtnA/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
     // Kontrol sonucu buraya kaydedilecek
     let sinifDahaOnceDolduruldu = false;
@@ -125,22 +124,23 @@
       opt.value = s; opt.text = s; select.add(opt);
     });
 
-    // Maddeleri ekleme
+    // Maddeleri ekleme: max="35" eklendi.
     const grid = document.querySelector(".grid");
     maddeler.forEach((madde, i) => {
       let div = document.createElement("div");
-      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" id="m${i+1}" placeholder="Sayı giriniz">`;
+      // !!! max="35" kısıtlaması buraya eklendi.
+      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı (Max 35)">`;
       grid.appendChild(div);
     });
 
-    // Sınıfı sunucudan kontrol eden fonksiyon
+
+    // Sınıfı sunucudan kontrol eden fonksiyon (Değişiklik yapılmadı)
     function kontrolEt() {
         const sinif = document.getElementById("sinif").value;
         const sonucDiv = document.getElementById("sonuc");
         const gonderBtn = document.getElementById("gonderBtn");
         const sinifSelect = document.getElementById("sinif");
 
-        // Başlangıç veya boş seçim kontrolü
         if (!sinif || sinif === "Seçiniz") {
             sinifDahaOnceDolduruldu = false;
             gonderBtn.disabled = false;
@@ -153,16 +153,14 @@
         gonderBtn.disabled = true;
         sinifSelect.className = '';
 
-        // Kontrol için Google Apps Script'e GET isteği gönderme
         fetch(`${WEB_APP_URL}?sinif=${encodeURIComponent(sinif)}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP Hata: ${response.status}`);
                 }
-                return response.json(); // Yanıtı JSON olarak işle
+                return response.json();
             })
             .then(data => {
-                // Varsayım: GAS, { exists: true/false } şeklinde yanıt veriyor.
                 sinifDahaOnceDolduruldu = data.exists;
 
                 if (sinifDahaOnceDolduruldu) {
@@ -176,7 +174,6 @@
                 }
             })
             .catch(error => {
-                // Ağ hatası, JSON ayrıştırma hatası veya HTTP hata durumunda
                 sonucDiv.innerHTML = "<b style='color:red'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
                 gonderBtn.disabled = true;
                 sinifSelect.className = 'error';
@@ -198,6 +195,27 @@
           return;
       }
       
+      // !!! YENİ: 35 Sayı Kısıtlaması için Gelişmiş Kontrol
+      let sinifGecerli = true;
+      maddeler.forEach((madde, i) => {
+          let inputElement = document.getElementById(`m${i+1}`);
+          let deger = parseInt(inputElement.value);
+
+          // Sayı değilse veya 0'dan küçük ya da 35'ten büyükse hata ver
+          if (isNaN(deger) || deger < 0 || deger > 35) {
+              alert(`HATA: ${i+1}. maddeye girilen değer geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
+              inputElement.focus(); // Hatalı alana odaklan
+              sinifGecerli = false;
+              return; // Döngüden çıkmak için
+          }
+      });
+
+      if (!sinifGecerli) {
+          return; // Geçersiz giriş varsa işlemi durdur
+      }
+      // !!! Kısıtlama Kontrolü Bitti
+
+      
       let data = {
         sinif: document.getElementById("sinif").value,
         tarih: new Date().toLocaleString()
@@ -218,7 +236,6 @@
         body: JSON.stringify(data) 
       }).then(() => {
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
-        // Başarılı gönderim sonrası tekrar doldurulmasını engelle
         sinifDahaOnceDolduruldu = true; 
         document.getElementById("gonderBtn").disabled = true;
       }).catch(error => {
@@ -248,9 +265,3 @@
   </script>
 </body>
 </html>
-</html>
-
-
-
-
-
