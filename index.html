@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Okul Risk Haritası Anketi</title>
   <style>
+    /* ... (CSS Kodunuz) ... */
     body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
     h1 { text-align: center; color: #333; }
     .form-container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -60,7 +61,9 @@
     <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin.</p>
 
     <label>Sınıf / Şube</label>
-    <select id="sinif" onchange="kontrolEt()"></select> <div class="grid">
+    <select id="sinif" onchange="kontrolEt()"></select>
+
+    <div class="grid">
       </div>
 
     <div class="button-group">
@@ -72,8 +75,8 @@
   </div>
 
   <script>
-    // ÖNEMLİ: Bu, kontrol ve gönderme için ortak GAS URL'nizdir.
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzMe5LzrEnIQpcBUq0Bn50ID_zigvagGCxDleK_1BE/dev"; 
+    // **ÖNEMLİ: Bu URL doğru olmalıdır.**
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
     // Kontrol sonucu buraya kaydedilecek
     let sinifDahaOnceDolduruldu = false;
@@ -130,14 +133,14 @@
       grid.appendChild(div);
     });
 
-    // *** YENİ: Sınıfı sunucudan kontrol eden fonksiyon ***
+    // Sınıfı sunucudan kontrol eden fonksiyon
     function kontrolEt() {
         const sinif = document.getElementById("sinif").value;
         const sonucDiv = document.getElementById("sonuc");
         const gonderBtn = document.getElementById("gonderBtn");
         const sinifSelect = document.getElementById("sinif");
 
-        // Başlangıç veya boş seçim ise kontrol yapma
+        // Başlangıç veya boş seçim kontrolü
         if (!sinif || sinif === "Seçiniz") {
             sinifDahaOnceDolduruldu = false;
             gonderBtn.disabled = false;
@@ -148,11 +151,16 @@
 
         sonucDiv.innerHTML = "<b style='color:blue'>Kontrol ediliyor...</b>";
         gonderBtn.disabled = true;
-        sinifSelect.className = ''; // Stil temizle
+        sinifSelect.className = '';
 
         // Kontrol için Google Apps Script'e GET isteği gönderme
         fetch(`${WEB_APP_URL}?sinif=${encodeURIComponent(sinif)}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Hata: ${response.status}`);
+                }
+                return response.json(); // Yanıtı JSON olarak işle
+            })
             .then(data => {
                 // Varsayım: GAS, { exists: true/false } şeklinde yanıt veriyor.
                 sinifDahaOnceDolduruldu = data.exists;
@@ -168,6 +176,7 @@
                 }
             })
             .catch(error => {
+                // Ağ hatası, JSON ayrıştırma hatası veya HTTP hata durumunda
                 sonucDiv.innerHTML = "<b style='color:red'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
                 gonderBtn.disabled = true;
                 sinifSelect.className = 'error';
@@ -183,7 +192,7 @@
         return;
       }
 
-      // *** YENİ KONTROL: Daha önce doldurulduysa gönderime izin verme ***
+      // 2. Kısıtlama Kontrolü
       if (sinifDahaOnceDolduruldu) {
           alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
           return;
@@ -194,13 +203,13 @@
         tarih: new Date().toLocaleString()
       };
       
-      // 2. Veri Toplama
+      // 3. Veri Toplama
       maddeler.forEach((_, i) => {
         let deger = document.getElementById(`m${i+1}`).value.trim();
         data[`m${i+1}`] = deger === "" ? "0" : deger;
       });
 
-      // 3. Veriyi Gönderme
+      // 4. Veriyi Gönderme
       document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
       
       fetch(WEB_APP_URL, {
@@ -239,4 +248,6 @@
   </script>
 </body>
 </html>
+</html>
+
 
