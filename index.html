@@ -18,9 +18,9 @@
 </head>
 <body>
   <div class="form-container">
-<div style="text-align:center; margin-bottom:20px;">
-  <img src="logo.png" alt="Okul Logosu" style="max-height:100px;">
-</div>
+    <div style="text-align:center; margin-bottom:20px;">
+      <img src="logo.png" alt="Okul Logosu" style="max-height:100px;">
+    </div>
     <h1>Okul Risk Haritası Anketi</h1>
     <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin.</p>
 
@@ -31,88 +31,69 @@
     <input type="text" id="ogretmen" required>
 
     <div class="grid">
-      <!-- 36 madde otomatik aşağıda eklenecek -->
-    </div>
+      </div>
 
     <center><button onclick="gonder()">Gönder</button></center>
     <div class="info" id="sonuc"></div>
   </div>
 
-  <!-- Google Apps Script Web App URL’si (aşağıya kendi oluşturduğun linki yapıştır) -->
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; // BURAYI DEĞİŞTİRME, BENİM HAZIRLADIĞIM ÇALIŞIYOR
+    // **ÖNEMLİ: Bu URL sizin kendi Google Apps Script URL'niz olmalıdır.**
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
-    const siniflar = [
-      "1-A","1-B","1-C","1-D","1-E","1-F",
-      "2-A","2-B","2-C","2-D","2-E","2-F",
-      "2. Sınıf - Hafif Zihinsel / A Şubesi",
-      "2. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
-      "2. Sınıf - Otistik Hafif / A Şubesi",
-      "3-A","3-B","3-C","3-D","3-E","3-F",
-      "3. Sınıf - Hafif Zihinsel / A Şubesi",
-      "3. Sınıf - Otistik Hafif / A Şubesi",
-      "4-A","4-B","4-C","4-D","4-E","4-F",
-      "4. Sınıf - Hafif Zihinsel / AA Şubesi",
-      "4. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
-      "4. Sınıf - Otistik Hafif / A Şubesi",
-      "Diğer"
-    ];
+    const siniflar = [
+      "1-A","1-B","1-C","1-D","1-E","1-F",
+      "2-A","2-B","2-C","2-D","2-E","2-F",
+      "2. Sınıf - Hafif Zihinsel / A Şubesi",
+      "2. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
+      "2. Sınıf - Otistik Hafif / A Şubesi",
+      "3-A","3-B","3-C","3-D","3-E","3-F",
+      "3. Sınıf - Hafif Zihinsel / A Şubesi",
+      "3. Sınıf - Otistik Hafif / A Şubesi",
+      "4-A","4-B","4-C","4-D","4-E","4-F",
+      "4. Sınıf - Hafif Zihinsel / AA Şubesi",
+      "4. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
+      "4. Sınıf - Otistik Hafif / A Şubesi",
+      "Diğer"
+    ];
 
-    const maddeler = [
-      "Kaç öğrencinizin annesi en fazla ilkokul mezunu?",
-      "Kaç öğrencinizin babası en fazla ilkokul mezunu?",
-      "Sınıfınızda yalnızca tek çocuk olan kaç öğrenci var?",
-      "Kaç öğrencinizin 5 veya daha fazla kardeşi var?",
-      "Kaç öğrencinizin anne ve babası ayrı yaşıyor?",
-      "Kaç öğrencinizin anne ve babası boşanmış?",
-      "Sınıfınızda yalnızca annesi ile yaşayan kaç öğrenci var?",
-      "Sınıfınızda yalnızca babası ile yaşayan kaç öğrenci var?",
-      "Kaç öğrencinizin annesi hayatta değil?",
-      "Kaç öğrencinizin babası hayatta değil?",
-      "Kaç öğrencinizin anne ve babası hayatta değil?",
-      "Sınıfınızda şehit çocuğu olan kaç öğrenci var?",
-      "Kaç öğrenciniz yalnızca büyükanne/büyükbabasıyla yaşıyor?",
-      "Kaç öğrenciniz yalnızca diğer akrabalarıyla yaşıyor?",
-      "Kaç öğrenciniz koruyucu aile gözetiminde?",
-      "Kaç öğrenciniz sevgi evlerinde kalıyor?",
-      "Kaç öğrenciniz Sosyal Hizmetler Çocuk Esirgeme Kurumu'nda kalıyor?",
-      "Kaç öğrencinizin ailesinde süreğen hastalık var?",
-      "Kaç öğrencinizin ailesinde ruhsal hastalık var?",
-      "Kaç öğrencinizin ailesinde bağımlı bireyler (alkol/madde) bulunuyor?",
-      "Kaç öğrencinizin ailesinde cezai hüküm bulunuyor?",
-      "Kaç öğrencinizin ailesi mevsimlik işçi?",
-      "Kaç öğrenciniz aile içi şiddete maruz kalıyor?",
-      "Sınıfınızda özel yetenekli tanısı konulan kaç öğrenci var?",
-      "Kaç öğrencinizin yetersizlik alanında özel eğitim raporu var?",
-      "Kaç öğrencinizin süreğen hastalığı var?",
-      "Kaç öğrencinizin ruhsal hastalığı var?",
-      "Kaç öğrencinizin ailesinde Danışmanlık Tedbir Kararı var?",
-      "Kaç öğrencinizin ailesinde Eğitim Tedbir Kararı var?",
-      "Kaç öğrenciniz maddi sıkıntı yaşıyor?",
-      "Sınıfınızda sürekli devamsız olan kaç öğrenci var?",
-      "Kaç öğrenciniz bir işte çalışıyor?",
-      "Kaç öğrencinizin akademik başarısı düşük?",
-      "Kaç öğrenciniz riskli akran grubuna dahil?",
-      "Kaç öğrenciniz yabancı uyruklu?",
-      "Sınıfınızda diğer belirttiğiniz durumda kaç öğrenci var?"
-    ];
+    const maddeler = [
+      "Kaç öğrencinizin annesi en fazla ilkokul mezunu?", "Kaç öğrencinizin babası en fazla ilkokul mezunu?",
+      "Sınıfınızda yalnızca tek çocuk olan kaç öğrenci var?", "Kaç öğrencinizin 5 veya daha fazla kardeşi var?",
+      "Kaç öğrencinizin anne ve babası ayrı yaşıyor?", "Kaç öğrencinizin anne ve babası boşanmış?",
+      "Sınıfınızda yalnızca annesi ile yaşayan kaç öğrenci var?", "Sınıfınızda yalnızca babası ile yaşayan kaç öğrenci var?",
+      "Kaç öğrencinizin annesi hayatta değil?", "Kaç öğrencinizin babası hayatta değil?",
+      "Kaç öğrencinizin anne ve babası hayatta değil?", "Sınıfınızda şehit çocuğu olan kaç öğrenci var?",
+      "Kaç öğrenciniz yalnızca büyükanne/büyükbabasıyla yaşıyor?", "Kaç öğrenciniz yalnızca diğer akrabalarıyla yaşıyor?",
+      "Kaç öğrenciniz koruyucu aile gözetiminde?", "Kaç öğrenciniz sevgi evlerinde kalıyor?",
+      "Kaç öğrenciniz Sosyal Hizmetler Çocuk Esirgeme Kurumu'nda kalıyor?", "Kaç öğrencinizin ailesinde süreğen hastalık var?",
+      "Kaç öğrencinizin ailesinde ruhsal hastalık var?", "Kaç öğrencinizin ailesinde bağımlı bireyler (alkol/madde) bulunuyor?",
+      "Kaç öğrencinizin ailesinde cezai hüküm bulunuyor?", "Kaç öğrencinizin ailesi mevsimlik işçi?",
+      "Kaç öğrenciniz aile içi şiddete maruz kalıyor?", "Sınıfınızda özel yetenekli tanısı konulan kaç öğrenci var?",
+      "Kaç öğrencinizin yetersizlik alanında özel eğitim raporu var?", "Kaç öğrencinizin süreğen hastalığı var?",
+      "Kaç öğrencinizin ruhsal hastalığı var?", "Kaç öğrencinizin ailesinde Danışmanlık Tedbir Kararı var?",
+      "Kaç öğrencinizin ailesinde Eğitim Tedbir Kararı var?", "Kaç öğrenciniz maddi sıkıntı yaşıyor?",
+      "Sınıfınızda sürekli devamsız olan kaç öğrenci var?", "Kaç öğrenciniz bir işte çalışıyor?",
+      "Kaç öğrencinizin akademik başarısı düşük?", "Kaç öğrenciniz riskli akran grubuna dahil?",
+      "Kaç öğrenciniz yabancı uyruklu?", "Sınıfınızda diğer belirttiğiniz durumda kaç öğrenci var?"
+    ];
 
-    // Sınıf seçimi doldur
-    const select = document.getElementById("sinif");
-    siniflar.forEach(s => {
-      let opt = document.createElement("option");
-      opt.value = s; opt.text = s; select.add(opt);
-    });
+    // Sınıf seçimi doldur
+    const select = document.getElementById("sinif");
+    siniflar.forEach(s => {
+      let opt = document.createElement("option");
+      opt.value = s; opt.text = s; select.add(opt);
+    });
 
-    // Maddeleri ekle
-    const grid = document.querySelector(".grid");
-    maddeler.forEach((madde, i) => {
-      let div = document.createElement("div");
-      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" id="m${i+1}" placeholder="Sayı giriniz">`;
-      grid.appendChild(div);
-    });
+    // Maddeleri ekle
+    const grid = document.querySelector(".grid");
+    maddeler.forEach((madde, i) => {
+      let div = document.createElement("div");
+      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" id="m${i+1}" placeholder="Sayı giriniz">`;
+      grid.appendChild(div);
+    });
 
-    // DÜZELTİLMİŞ GONDER FONKSİYONU
+    // **DÜZELTİLMİŞ GONDER FONKSİYONU**
     function gonder() {
       // 1. Gerekli Kontroller
       if (!document.getElementById("sinif").value || !document.getElementById("ogretmen").value) {
@@ -126,7 +107,7 @@
         tarih: new Date().toLocaleString()
       };
       
-      // 2. Veri Toplama (Döngü SADECE veriyi toplar)
+      // 2. Veri Toplama
       maddeler.forEach((_, i) => {
         let deger = document.getElementById(`m${i+1}`).value.trim();
         // Boş bırakılan alanları "0" olarak kabul et
@@ -139,15 +120,17 @@
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(data)
+        // Veriyi sunucuya JSON dizesi olarak gönder
+        body: JSON.stringify(data) 
       }).then(() => {
+        // İşlem başarılı olduğunda (no-cors modunda bile resolve olur)
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
       }).catch(error => {
+        // Hata yakalama
         document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
         console.error('Gönderme hatası:', error);
       });
-    } // FONKSİYON BURADA KAPANIYOR.
-  </script>
+    }
+  </script>
 </body>
 </html>
