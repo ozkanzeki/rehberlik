@@ -113,15 +113,28 @@
     });
 
     function gonder() {
+      // 1. Gerekli Kontroller
+      if (!document.getElementById("sinif").value || !document.getElementById("ogretmen").value) {
+        alert("Lütfen Sınıf ve Öğretmen Adı/Soyadı alanlarını doldurun.");
+        return;
+      }
+      
       let data = {
         sinif: document.getElementById("sinif").value,
         ogretmen: document.getElementById("ogretmen").value,
         tarih: new Date().toLocaleString()
       };
+      
+      // 2. Veri Toplama (Döngü SADECE veriyi toplar)
       maddeler.forEach((_, i) => {
         let deger = document.getElementById(`m${i+1}`).value.trim();
-data[`m${i+1}`] = deger === "" ? "0" : deger;
+        // Boş bırakılan alanları "0" olarak kabul et
+        data[`m${i+1}`] = deger === "" ? "0" : deger;
+      });
 
+      // 3. Veriyi Gönderme (Fetch SADECE bir kez çalışır)
+      document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
+      
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
@@ -129,12 +142,11 @@ data[`m${i+1}`] = deger === "" ? "0" : deger;
         body: JSON.stringify(data)
       }).then(() => {
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
+      }).catch(error => {
+        document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
+        console.error('Gönderme hatası:', error);
       });
-    }
+    } // FONKSİYON BURADA KAPANIYOR.
   </script>
-</body {
-  font-family: 'Segoe UI', sans-serif;
-  margin: 0;
-  background: linear-gradient(to right, #e0f7fa, #ffffff);
-}>
+</body>
 </html>
