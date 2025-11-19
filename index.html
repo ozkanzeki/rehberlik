@@ -189,41 +189,43 @@ function gonder() {
         return;
     }
 
-    // 2. Kısıtlama Kontrolü
+    // 2. Kısıtlama Kontrolü (Daha Önce Dolduruldu mu?)
     if (sinifDahaOnceDolduruldu) {
         alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
         return;
     }
 
-    // !!! YENİ VE GÜVENİLİR KISITLAMA KONTROLÜ (0-35 Aralığı)
-    let sinifGecerli = true;
-    let hatalıMaddeNo = -1; // Hatalı maddenin numarasını tutar
-
+    // !!! GÜVENİLİR KISITLAMA KONTROLÜ (0-35 Aralığı) !!!
+    let hatalıGirişBulundu = false;
+    
+    // Geçerlilik Kontrolü için geçici olarak döngü
     for (let i = 0; i < maddeler.length; i++) {
         let inputElement = document.getElementById(`m${i + 1}`);
-        let deger = inputElement.value.trim(); // Boşlukları temizle
-        let sayiDeger = parseInt(deger);
+        let deger = inputElement.value.trim();
+        let sayiDeger;
 
-        // Boş bırakılanları 0 olarak kabul et, ancak sınır kontrolünü yap
         if (deger === "") {
-            sayiDeger = 0;
+            sayiDeger = 0; // Boş alanları 0 olarak kabul et
+        } else {
+            sayiDeger = parseInt(deger); // Sayı değerine çevir
         }
 
-        // Sayı değilse VEYA 0'dan küçük VEYA 35'ten büyükse
+        // Sayı değilse VEYA 0'dan küçük VEYA 35'ten büyükse hata ver
         if (isNaN(sayiDeger) || sayiDeger < 0 || sayiDeger > 35) {
-            hatalıMaddeNo = i + 1;
-            sinifGecerli = false;
+            alert(`HATA: ${i + 1}. maddeye girilen değer ("${deger}") geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
             inputElement.focus();
+            hatalıGirişBulundu = true;
             break; // Hata bulunduğunda döngüyü hemen durdur
         }
     }
 
-    if (!sinifGecerli) {
-        alert(`HATA: ${hatalıMaddeNo}. maddeye girilen değer geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
-        return; // Geçersiz giriş varsa işlemi durdur ve gönderimi engelle
+    if (hatalıGirişBulundu) {
+        return; // Hata varsa, fonksiyonu burada sonlandır.
     }
-    // !!! Kısıtlama Kontrolü Bitti
-
+    // !!! Kısıtlama Kontrolü Bitti !!!
+    
+    
+    // Hata yoksa veri toplama başlar
     let data = {
         sinif: document.getElementById("sinif").value,
         tarih: new Date().toLocaleString()
@@ -273,4 +275,5 @@ function gonder() {
   </script>
 </body>
 </html>
+
 
