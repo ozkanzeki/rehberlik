@@ -11,8 +11,21 @@
     label { display: block; margin: 15px 0 5px; font-weight: bold; }
     select, input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 20px; }
-    button { margin-top: 30px; padding: 15px 30px; background: #28a745; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; }
-    button:hover { background: #218838; }
+    /* Butonlar için yeni bir stil ekleyelim */
+    .button-group { text-align: center; margin-top: 30px; }
+    .button-group button { 
+      padding: 15px 30px; 
+      border: none; 
+      border-radius: 5px; 
+      font-size: 18px; 
+      cursor: pointer; 
+      margin: 0 10px; /* Butonlar arasına boşluk */
+    }
+    .gonder-btn { background: #28a745; color: white; }
+    .gonder-btn:hover { background: #218838; }
+    .temizle-btn { background: #dc3545; color: white; } /* Kırmızı renk temizlemek için */
+    .temizle-btn:hover { background: #c82333; }
+    
     .info { text-align: center; color: #666; margin-top: 20px; }
   </style>
 </head>
@@ -33,12 +46,14 @@
     <div class="grid">
       </div>
 
-    <center><button onclick="gonder()">Gönder</button></center>
+    <div class="button-group">
+        <button class="gonder-btn" onclick="gonder()">Gönder</button>
+        <button class="temizle-btn" onclick="temizle()">Temizle</button>
+    </div>
     <div class="info" id="sonuc"></div>
   </div>
 
   <script>
-    // **ÖNEMLİ: Bu URL sizin kendi Google Apps Script URL'niz olmalıdır.**
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
     const siniflar = [
@@ -93,7 +108,7 @@
       grid.appendChild(div);
     });
 
-    // **DÜZELTİLMİŞ GONDER FONKSİYONU**
+    // GONDER FONKSİYONU (Değişiklik yapılmadı)
     function gonder() {
       // 1. Gerekli Kontroller
       if (!document.getElementById("sinif").value || !document.getElementById("ogretmen").value) {
@@ -110,27 +125,43 @@
       // 2. Veri Toplama
       maddeler.forEach((_, i) => {
         let deger = document.getElementById(`m${i+1}`).value.trim();
-        // Boş bırakılan alanları "0" olarak kabul et
         data[`m${i+1}`] = deger === "" ? "0" : deger;
       });
 
-      // 3. Veriyi Gönderme (Fetch SADECE bir kez çalışır)
+      // 3. Veriyi Gönderme
       document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
       
       fetch(WEB_APP_URL, {
         method: "POST",
         mode: "no-cors",
-        // Veriyi sunucuya JSON dizesi olarak gönder
         body: JSON.stringify(data) 
       }).then(() => {
-        // İşlem başarılı olduğunda (no-cors modunda bile resolve olur)
         document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
       }).catch(error => {
-        // Hata yakalama
         document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
         console.error('Gönderme hatası:', error);
       });
     }
+
+    // ********** YENİ TEMİZLE FONKSİYONU **********
+    function temizle() {
+        // Öğretmen adını temizle
+        document.getElementById("ogretmen").value = "";
+        
+        // Sınıf seçimini ilk değere (genellikle boş veya ilk şube) ayarla
+        document.getElementById("sinif").selectedIndex = 0;
+
+        // Tüm madde (input) alanlarını temizle
+        maddeler.forEach((_, i) => {
+            document.getElementById(`m${i+1}`).value = "";
+        });
+
+        // Sonuç mesajını temizle
+        document.getElementById("sonuc").innerHTML = "";
+
+        alert("Form temizlendi.");
+    }
+    // **********************************************
   </script>
 </body>
 </html>
