@@ -75,7 +75,7 @@
 
   <script>
     // **ÖNEMLİ: Bu URL doğru olmalıdır.**
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxDi_30Il4pBG7U8C5ViMu4Ji3Qn4hYw00RzSvuLvVzHERUElgPeySNH5AgEPFl_rRtnA/exec"; 
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
 
     // Kontrol sonucu buraya kaydedilecek
     let sinifDahaOnceDolduruldu = false;
@@ -128,7 +128,208 @@
     const grid = document.querySelector(".grid");
     maddeler.forEach((madde, i) => {
       let div = document.createElement("div");
-      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı giriniz lütfen">`;
+      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı (Max 35)">`;
+      grid.appendChild(div);
+    });
+
+
+    // Sınıfı sunucudan kontrol eden fonksiyon
+    function kontrolEt() {
+        const sinif = document.getElementById("sinif").value;
+        const sonucDiv = document.getElementById("sonuc");
+        const gonderBtn = document.getElementById("gonderBtn");
+        const sinifSelect = document.getElementById("sinif");
+
+        if (!sinif || sinif === "Seçiniz") {
+            sinifDahaOnceDolduruldu = false;
+            gonderBtn.disabled = false;
+            sinifSelect.className = '';
+            sonucDiv.innerHTML = '';
+            return;
+        }
+
+        sonucDiv.innerHTML = "<b style='color:blue'>Kontrol ediliyor...</b>";
+        gonderBtn.disabled = true;
+        sinifSelect.className = '';
+
+        fetch(`${WEB_APP_URL}?sinif=${encodeURIComponent(sinif)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Hata: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                sinifDahaOnceDolduruldu = data.exists;
+
+                if (sinifDahaOnceDolduruldu) {
+                    sonucDiv.innerHTML = `<b style='color:red'>⚠️ Uyarı: ${sinif} şubesi daha önce doldurulmuştur. Tekrar gönderim YAPILAMAZ.</b>`;
+                    gonderBtn.disabled = true;
+                    sinifSelect.className = 'error';
+                } else {
+                    sonucDiv.innerHTML = `<b style='color:green'>✅ ${sinif} şubesi daha önce doldurulmamış. Gönderim yapılabilir.</b>`;
+                    gonderBtn.disabled = false;
+                    sinifSelect.className = 'success';
+                }
+            })
+            .catch(error => {
+                sonucDiv.innerHTML = "<b style='color:red'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
+                gonderBtn.disabled = true;
+                sinifSelect.className = 'error';
+                console.error("Kontrol hatası:", error);
+            });
+    }
+
+    // GONDER FONKSİYONU
+    function gonder() {
+        // 1. Gerekli Kontroller
+        if (!document.getElementById("sinif").value || document.getElementById("sinif").value === "Seçiniz") {
+            alert("Lütfen Sınıf alanını doldurun.");
+            return;
+        }
+
+        // 2. Kısıtlama Kontrolü (Daha Önce Dolduruldu mu?)
+        if (sinifDahaOnceDolduruldu) {
+            alert("Bu sınıf daha önce doldurulduğu için gönderim yapılamaz.");
+            return;
+        }
+
+        // !!! YENİ VE GÜVENİLİR KISITLAMA KONTROLÜ (Boşluk ve 0-35 Aralığı) !!!
+        const hatalıGirisBulundu = maddeler.some((_, i) => {
+            let inputElement = document.getElementById(`m${i + 1}`);
+            let deger = inputElement.value.trim();
+            let sayiDeger;
+
+            // KONTROL A: Boş Bırakıldı mı? (Yeni Kontrol)
+            if (deger === "") {
+                alert(`HATA: ${i + 1}. madde boş bırakılamaz. Lütfen 0 ile 35 arasında bir sayı girin.`);
+                inputElement.focus();
+                return true; // Hata bulundu, döngüyü durdur
+            } 
+            
+            // KONTROL B: Sayı ve Sınırlar İçinde mi?
+            sayiDeger = parseInt(deger);
+
+            // Sayı değilse VEYA 0'dan küçük VEYA 35'ten büyükse
+            if (isNaN(sayiDeger) || sayiDeger < 0 || sayiDeger > 35) {
+                alert(`HATA: ${i + 1}. maddeye girilen değer ("${deger}") geçersizdir. Lütfen 0 ile 35 arasında bir sayı girin.`);
+                inputElement.focus();
+                return true; // Hata bulundu, döngüyü durdur
+            }
+            
+            return false;
+        });
+
+        if (hatalıGirisBulundu) {
+            return; // Hata varsa, gönderimi engelle
+        }
+        // !!! Kısıtlama Kontrolü Bitti !!!
+
+        
+        // Hata yoksa veri toplama başlar
+        let data = {
+            sinif: document.getElementById("sinif").value,
+            tarih: new Date().toLocaleString()
+        };
+
+        // 3. Veri Toplama (Değerler zaten kontrol edildi)
+        maddeler.forEach((_, i) => {
+            let deger = document.getElementById(`m${i + 1}`).value.trim();
+            // Boş olamayacağı garanti edildiği için burada sadece değeri alıyoruz.
+            data[`m${i + 1}`] = deger; 
+        });
+
+        // 4. Veriyi Gönderme
+        document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(data)
+        }).then(() => {
+            document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
+            sinifDahaOnceDolduruldu = true;
+            document.getElementById("gonderBtn").disabled = true;
+        }).catch(error => {
+            document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
+            console.error('Gönderme hatası:', error);
+        });
+    }
+
+    // TEMİZLE FONKSİYONU
+    function temizle() {
+        // Sınıf seçimini ilk değere ayarla
+        document.getElementById("sinif").selectedIndex = 0;
+        document.getElementById("sinif").className = '';
+
+        // Tüm madde (input) alanlarını temizle
+        maddeler.forEach((_, i) => {
+            document.getElementById(`m${i+1}`).value = "";
+        });
+
+        // Sonuç durumunu sıfırla ve butonu etkinleştir
+        sinifDahaOnceDolduruldu = false;
+        document.getElementById("gonderBtn").disabled = false;
+        document.getElementById("sonuc").innerHTML = "";
+
+        alert("Form temizlendi.");
+    }
+  </script><script>
+    // **ÖNEMLİ: Bu URL doğru olmalıdır.**
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw8432Rg_H3pTZP4A-IryESZTDlN81ZE66fGij_UJJ1YzTKuzS7iUaa5wKzbB_uuud6/exec"; 
+
+    // Kontrol sonucu buraya kaydedilecek
+    let sinifDahaOnceDolduruldu = false;
+
+    const siniflar = [
+      "Seçiniz","1-A","1-B","1-C","1-D","1-E","1-F",
+      "2-A","2-B","2-C","2-D","2-E","2-F",
+      "2. Sınıf - Hafif Zihinsel / A Şubesi",
+      "2. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
+      "2. Sınıf - Otistik Hafif / A Şubesi",
+      "3-A","3-B","3-C","3-D","3-E","3-F",
+      "3. Sınıf - Hafif Zihinsel / A Şubesi",
+      "3. Sınıf - Otistik Hafif / A Şubesi",
+      "4-A","4-B","4-C","4-D","4-E","4-F",
+      "4. Sınıf - Hafif Zihinsel / AA Şubesi",
+      "4. Sınıf - Orta-Ağır Zihinsel / AA Şubesi",
+      "4. Sınıf - Otistik Hafif / A Şubesi",
+      "Diğer"
+    ];
+
+    const maddeler = [
+      "Kaç öğrencinizin annesi en fazla ilkokul mezunu?", "Kaç öğrencinizin babası en fazla ilkokul mezunu?",
+      "Sınıfınızda yalnızca tek çocuk olan kaç öğrenci var?", "Kaç öğrencinizin 5 veya daha fazla kardeşi var?",
+      "Kaç öğrencinizin anne ve babası ayrı yaşıyor?", "Kaç öğrencinizin anne ve babası boşanmış?",
+      "Sınıfınızda yalnızca annesi ile yaşayan kaç öğrenci var?", "Sınıfınızda yalnızca babası ile yaşayan kaç öğrenci var?",
+      "Kaç öğrencinizin annesi hayatta değil?", "Kaç öğrencinizin babası hayatta değil?",
+      "Kaç öğrencinizin anne ve babası hayatta değil?", "Sınıfınızda şehit çocuğu olan kaç öğrenci var?",
+      "Kaç öğrenciniz yalnızca büyükanne/büyükbabasıyla yaşıyor?", "Kaç öğrenciniz yalnızca diğer akrabalarıyla yaşıyor?",
+      "Kaç öğrenciniz koruyucu aile gözetiminde?", "Kaç öğrenciniz sevgi evlerinde kalıyor?",
+      "Kaç öğrenciniz Sosyal Hizmetler Çocuk Esirgeme Kurumu'nda kalıyor?", "Kaç öğrencinizin ailesinde süreğen hastalık var?",
+      "Kaç öğrencinizin ailesinde ruhsal hastalık var?", "Kaç öğrencinizin ailesinde bağımlı bireyler (alkol/madde) bulunuyor?",
+      "Kaç öğrencinizin ailesinde cezai hüküm bulunuyor?", "Kaç öğrencinizin ailesi mevsimlik işçi?",
+      "Kaç öğrenciniz aile içi şiddete maruz kalıyor?", "Sınıfınızda özel yetenekli tanısı konulan kaç öğrenci var?",
+      "Kaç öğrencinizin yetersizlik alanında özel eğitim raporu var?", "Kaç öğrencinizin süreğen hastalığı var?",
+      "Kaç öğrencinizin ruhsal hastalığı var?", "Kaç öğrencinizin ailesinde Danışmanlık Tedbir Kararı var?",
+      "Kaç öğrencinizin ailesinde Eğitim Tedbir Kararı var?", "Kaç öğrenciniz maddi sıkıntı yaşıyor?",
+      "Sınıfınızda sürekli devamsız olan kaç öğrenci var?", "Kaç öğrenciniz bir işte çalışıyor?",
+      "Kaç öğrencinizin akademik başarısı düşük?", "Kaç öğrenciniz riskli akran grubuna dahil?",
+      "Kaç öğrenciniz yabancı uyruklu?", "Sınıfınızda diğer belirttiğiniz durumda kaç öğrenci var?"
+    ];
+
+    // Sınıf seçimi doldurma
+    const select = document.getElementById("sinif");
+    siniflar.forEach(s => {
+      let opt = document.createElement("option");
+      opt.value = s; opt.text = s; select.add(opt);
+    });
+
+    // Maddeleri ekleme: max="35" kısıtlaması zaten ekli
+    const grid = document.querySelector(".grid");
+    maddeler.forEach((madde, i) => {
+      let div = document.createElement("div");
+      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı (Max 35)">`;
       grid.appendChild(div);
     });
 
@@ -277,6 +478,7 @@
   </script>
 </body>
 </html>
+
 
 
 
