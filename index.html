@@ -5,109 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Okul Risk Haritası Anketi</title>
   <style>
-    /* Genel Stil ve Mobil Öncelik */
+    /* Genel Stil ve Renk Paleti */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         margin: 0; 
-        padding: 20px;
-        background: #eef2f5; /* Açık mavi-gri arka plan */
+        padding: 20px 10px; /* Mobil padding */
+        background: #f0f8ff; /* Açık ve ferah arka plan */
+        color: #333;
     }
     h1 { 
         text-align: center; 
-        color: #1a1a1a; 
+        color: #007bff; /* Başlık için canlı mavi */
         font-size: 1.8em; 
         margin-bottom: 5px;
     }
     .form-container { 
-        width: 100%; /* Mobil genişlik */
-        max-width: 700px; /* Masaüstünde maks. genişlik */
+        width: 100%;
+        max-width: 760px; /* Form genişliği biraz artırıldı */
         margin: 20px auto; 
         background: white; 
-        padding: 30px 20px; /* İç boşluk artırıldı */
+        padding: 30px 20px;
         border-radius: 12px; 
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Yumuşak gölge */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1); /* Belirgin gölge */
     }
     .form-container p {
         text-align: center;
         color: #555;
+        margin-bottom: 30px;
+        font-size: 1em;
+    }
+    /* Sınıf Seçimi Alanı */
+    .sinif-select-group {
         margin-bottom: 25px;
-        font-size: 0.95em;
+        padding: 15px;
+        border: 1px solid #cceeff; /* Açık mavi kenarlık */
+        border-radius: 8px;
+        background: #f7fcff; /* Çok açık mavi arka plan */
     }
-    label { 
-        display: block; 
-        margin: 15px 0 5px; 
-        font-weight: 600; /* Kalınlık artırıldı */
-        color: #333;
-    }
-    
+
     /* Giriş Alanı Stilleri */
     select, input[type="number"] { 
         width: 100%; 
-        max-width: 300px; 
-        height: 44px; /* Kolay tıklama için yükseklik */
+        max-width: 300px; /* Giriş genişliği sınırlı tutuldu */
+        height: 44px;
         padding: 10px 15px; 
         border: 1px solid #ddd; 
         border-radius: 8px; 
         box-sizing: border-box;
-        transition: border-color 0.3s;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        margin-top: 5px; /* Cevap girişinin sorunun altında olduğunu vurgulamak için */
     }
     select:focus, input[type="number"]:focus {
         border-color: #007bff;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
     }
 
     /* Sınıf Kontrol Stilleri */
     #sinif.error { border: 2px solid #dc3545; }
     #sinif.success { border: 2px solid #28a745; }
 
-
-    /* Sorular Alt Alta Dizilimi */
+    /* Her Soru İçin Ayrı Kutu (Cevap Girişleri Soruların Altında) */
     .grid { 
-        display: block; /* Basit alt alta dizilim */
+        display: grid; 
+        grid-template-columns: 1fr; /* Mobil ve küçük ekranlar için tek sütun */
+        gap: 20px; 
         margin-top: 10px; 
     }
     .grid > div {
-        margin-bottom: 10px;
-        padding-bottom: 10px;
-        border-bottom: 1px dashed #eee;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    .grid label {
+        margin: 0 0 5px 0; /* Soruyu input'tan ayır */
+        font-weight: 700;
+        font-size: 1.05em;
     }
 
     /* Buton Grubu Stilleri */
     .button-group { 
-        display: flex; /* Butonları yan yana hizala */
-        justify-content: center; 
-        gap: 20px; /* Butonlar arasına boşluk */
+        display: flex; 
+        flex-direction: column; /* Mobil için dikey */
+        gap: 15px; 
         margin-top: 40px; 
     }
     .button-group button { 
-      padding: 12px 25px; 
+      padding: 15px 25px; 
       border: none; 
       border-radius: 8px; 
-      font-size: 16px; 
+      font-size: 17px; 
       cursor: pointer; 
       font-weight: 600;
       transition: background-color 0.3s;
     }
     .gonder-btn { background: #28a745; color: white; }
     .gonder-btn:hover:not([disabled]) { background: #218838; }
-    .temizle-btn { background: #6c757d; color: white; } /* Daha yumuşak temizle rengi */
-    .temizle-btn:hover { background: #5a6268; }
+    .temizle-btn { background: #007bff; color: white; } /* Mavi Temizle butonu */
+    .temizle-btn:hover { background: #0056b3; }
     
     /* Pasif buton görünümü */
     .gonder-btn[disabled] { background: #9e9e9e; cursor: not-allowed; }
     
     .info { 
         text-align: center; 
-        color: #666; 
-        margin-top: 20px; 
+        color: #555; 
+        margin-top: 25px; 
         font-weight: 500;
+        padding: 10px;
+        border-top: 1px solid #eee;
     }
 
     /* Masaüstü İyileştirmeleri (768px üzeri) */
     @media (min-width: 768px) {
         .form-container {
             padding: 40px 50px;
+        }
+        .button-group {
+            flex-direction: row; /* Masaüstü için yatay */
+            justify-content: center; 
+        }
+        /* Soruları yan yana getirme (Daha iyi okuma için iki sütun) */
+        .grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
         }
     }
   </style>
@@ -120,8 +143,10 @@
     <h1>Okul Risk Haritası Anketi</h1>
     <p>Lütfen sınıfınızı seçin ve her maddeye ilgili öğrenci sayısını girin. Girişler en fazla 35 olabilir.</p>
 
-    <label>Sınıf / Şube</label>
-    <select id="sinif" onchange="kontrolEt()"></select>
+    <div class="sinif-select-group">
+        <label for="sinif">Sınıf / Şube</label>
+        <select id="sinif" onchange="kontrolEt()"></select>
+    </div>
 
     <div class="grid">
     </div>
@@ -188,7 +213,11 @@
     const grid = document.querySelector(".grid");
     maddeler.forEach((madde, i) => {
       let div = document.createElement("div");
-      div.innerHTML = `<label>${i+1}. ${madde}</label><input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı (Max 35)">`;
+      // Her maddeyi etiket (label) ve input olarak ayrı bir kutuya ekle
+      div.innerHTML = `
+            <label for="m${i+1}">${i+1}. ${madde}</label>
+            <input type="number" min="0" max="35" id="m${i+1}" placeholder="Sayı (Max 35)">
+        `;
       grid.appendChild(div);
     });
 
@@ -208,7 +237,7 @@
             return;
         }
 
-        sonucDiv.innerHTML = "<b style='color:blue'>Kontrol ediliyor...</b>";
+        sonucDiv.innerHTML = "<b style='color:#007bff'>Kontrol ediliyor...</b>";
         gonderBtn.disabled = true;
         sinifSelect.className = '';
 
@@ -223,17 +252,17 @@
                 sinifDahaOnceDolduruldu = data.exists;
 
                 if (sinifDahaOnceDolduruldu) {
-                    sonucDiv.innerHTML = `<b style='color:red'>⚠️ Uyarı: ${sinif} şubesi daha önce doldurulmuştur. Tekrar gönderim YAPILAMAZ.</b>`;
+                    sonucDiv.innerHTML = `<b style='color:#dc3545'>⚠️ Uyarı: ${sinif} şubesi daha önce doldurulmuştur. Tekrar gönderim YAPILAMAZ.</b>`;
                     gonderBtn.disabled = true;
                     sinifSelect.className = 'error';
                 } else {
-                    sonucDiv.innerHTML = `<b style='color:green'>✅ ${sinif} şubesi daha önce doldurulmamış. Gönderim yapılabilir.</b>`;
+                    sonucDiv.innerHTML = `<b style='color:#28a745'>✅ ${sinif} şubesi daha önce doldurulmamış. Gönderim yapılabilir.</b>`;
                     gonderBtn.disabled = false;
                     sinifSelect.className = 'success';
                 }
             })
             .catch(error => {
-                sonucDiv.innerHTML = "<b style='color:red'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
+                sonucDiv.innerHTML = "<b style='color:#dc3545'>HATA: Kontrol sırasında bir sorun oluştu. Lütfen tekrar deneyin.</b>";
                 gonderBtn.disabled = true;
                 sinifSelect.className = 'error';
                 console.error("Kontrol hatası:", error);
@@ -299,18 +328,18 @@
         });
 
         // 4. Veriyi Gönderme
-        document.getElementById("sonuc").innerHTML = "<b style='color:blue'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
+        document.getElementById("sonuc").innerHTML = "<b style='color:#007bff'>Lütfen bekleyin, verileriniz gönderiliyor...</b>";
 
         fetch(WEB_APP_URL, {
             method: "POST",
             mode: "no-cors",
             body: JSON.stringify(data)
         }).then(() => {
-            document.getElementById("sonuc").innerHTML = "<b style='color:green'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
+            document.getElementById("sonuc").innerHTML = "<b style='color:#28a745'>✓ Teşekkürler! Cevaplarınız kaydedildi.</b>";
             sinifDahaOnceDolduruldu = true;
             document.getElementById("gonderBtn").disabled = true;
         }).catch(error => {
-            document.getElementById("sonuc").innerHTML = "<b style='color:red'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
+            document.getElementById("sonuc").innerHTML = "<b style='color:#dc3545'>HATA: Veri gönderilirken bir sorun oluştu.</b>";
             console.error('Gönderme hatası:', error);
         });
     }
