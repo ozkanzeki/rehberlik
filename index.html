@@ -10,7 +10,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         margin: 0; 
         padding: 20px 10px; /* Mobil padding */
-        background: #f0f8ff; /* Açık ve ferah arka plan */
+        background: #f0f8ff; /* Açık mavi-beyaz arka plan */
         color: #333;
     }
     h1 { 
@@ -21,12 +21,12 @@
     }
     .form-container { 
         width: 100%;
-        max-width: 760px; /* Form genişliği biraz artırıldı */
+        max-width: 760px; 
         margin: 20px auto; 
         background: white; 
         padding: 30px 20px;
         border-radius: 12px; 
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1); /* Belirgin gölge */
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1); 
     }
     .form-container p {
         text-align: center;
@@ -65,7 +65,8 @@
     #sinif.error { border: 2px solid #dc3545; }
     #sinif.success { border: 2px solid #28a745; }
 
-    /* Her Soru İçin Ayrı Kutu (Cevap Girişleri Soruların Altında) */
+
+    /* Sorular ve Cevap Kutuları (ALT ALTA DİZİLİM VE KUTULAMA) */
     .grid { 
         display: grid; 
         grid-template-columns: 1fr; /* Mobil ve küçük ekranlar için tek sütun */
@@ -76,13 +77,14 @@
         padding: 15px;
         border: 1px solid #eee;
         border-radius: 8px;
-        background: #ffffff;
+        background: #ffffff; /* Soru kutusu rengi */
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
     .grid label {
         margin: 0 0 5px 0; /* Soruyu input'tan ayır */
         font-weight: 700;
         font-size: 1.05em;
+        color: #333;
     }
 
     /* Buton Grubu Stilleri */
@@ -127,7 +129,7 @@
             flex-direction: row; /* Masaüstü için yatay */
             justify-content: center; 
         }
-        /* Soruları yan yana getirme (Daha iyi okuma için iki sütun) */
+        /* Soruları iki sütuna bölme (Daha iyi okuma ve yerleşim için) */
         .grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 25px;
